@@ -42,4 +42,4 @@ class Device_Configuration:
     motor_returning_speed_head: Optional[int] = None
     motor_returning_accel_head: Optional[int] = None
 
-    tenzo_update_rate: Optional[int] = None
+    tenzo_update_rate: Optional[int] = Nogi
