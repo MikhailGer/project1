@@ -1,4 +1,3 @@
-#реализация подтягивания файла конфига из бд
 from Threads.SerialConnection import SerialThread
 from config import Default_Device_Configuration
 from PyQt5.QtWidgets import QListView
