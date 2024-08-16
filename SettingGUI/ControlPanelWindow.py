@@ -208,8 +208,6 @@ class App(QMainWindow, Ui_mainWindow):
         self.comboBox_mods.setEnabled(False)
         self.signal.custom_signal.emit(4)
 
-    #     что нам нужно: 1.получить конфиг, если нет - использовать дефолт; 2.Собрать данные из лайн эдитов. 3. кинуть на плату. 4. Получить данные с тензодатчикаб вывести их
-
     def stop_cycle(self):
         # self.currentScan =
         self.loop_stop.triggered.disconnect(self.stop_cycle)
