@@ -26,6 +26,8 @@ class Default_Device_Configuration:
     motor_returning_speed_head_default = 1
     motor_returning_accel_head_default = 1
 
+    head_working_pos = 300 #нужно будет замерить в ручную и сдлеать значение постоянным
+
     tenzo_update_rate_default = 10
 
 @dataclass
