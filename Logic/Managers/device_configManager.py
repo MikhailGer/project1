@@ -1,4 +1,4 @@
-from Managers.DataBaseManager import DBManager
+from Logic.Managers.DataBaseManager import DBManager
 from config import Default_Device_Configuration, Device_Configuration
 
 class Device_Configuration_Manager():

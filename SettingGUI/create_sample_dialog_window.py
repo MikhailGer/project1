@@ -10,8 +10,8 @@
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QDialog
-from Threads.Params_Thread import ParamsThread
-from Threads.Disc_Thread import DiscThread
+from Logic.Threads.Params_Thread import ParamsThread
+from Logic.Threads.Disc_Thread import DiscThread
 from config import Device_Configuration#motor_speed_base, motor_speed_blade, base_diameter
 
 

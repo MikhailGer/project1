@@ -3,18 +3,18 @@ import time
 
 from main_window import Ui_mainWindow
 
-from Threads.Disc_Thread import DiscThread
-from Threads.DiscScan_Thread import DiscScanThread
-from Threads.SerialConnection import ArduinoChecker, SerialThread
+from Logic.Threads.Disc_Thread import DiscThread
+from Logic.Threads.DiscScan_Thread import DiscScanThread
+from Logic.Threads.SerialConnection import ArduinoChecker, SerialThread
 
 from create_sample_dialog_window import Create_Sample_Dialog
 from device_settings_dialog import Create_Settings_Dialog
-from config import Device_Configuration
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog
-from PyQt5.QtSerialPort import QSerialPortInfo, QSerialPort
+from PyQt5.QtSerialPort import QSerialPortInfo
 from PyQt5.QtCore import QObject, pyqtSignal
 
+from Logic.developer_mode import DevMode
 
 class Signals(QObject):
     custom_signal = pyqtSignal(int)
@@ -23,6 +23,7 @@ class Signals(QObject):
 class App(QMainWindow, Ui_mainWindow):
     def __init__(self):
         super().__init__()
+        self.mode = None
         self.setupUi(self)
         # далее создается отдельный поток для связи с ардуино
         self.serial = SerialThread()
@@ -202,13 +203,15 @@ class App(QMainWindow, Ui_mainWindow):
 
     def developer_mode(self):  # режим отладки
         print("mode 4")
+        self.mode = DevMode(self)
+        self.mode.start_mode()
         self.loop_stop.triggered.connect(self.stop_cycle)
         self.comboBox_ports.setEnabled(False)
         self.comboBox_mods.setEnabled(False)
         self.signal.custom_signal.emit(4)
 
     def stop_cycle(self):
-        # self.currentScan =
+        self.mode.stop_mode()
         self.loop_stop.triggered.disconnect(self.stop_cycle)
         self.comboBox_ports.setEnabled(True)
         self.comboBox_mods.setEnabled(True)
@@ -217,6 +220,8 @@ class App(QMainWindow, Ui_mainWindow):
     def arduino_disconected(self):
         if self.loop_stop.isEnabled():  #если было запущено сканирование кнопка стоп активна
             self.loop_stop.trigger()  #прирывание сканирования
+        if self.mode != None:
+            self.mode.stop_mode()
         self.check_arduino.device_disconnected_signal.disconnect(self.arduino_disconected)
         self.comboBox_ports.currentIndexChanged.disconnect(self.arduino_disconected)
         self.comboBox_ports.currentIndexChanged.connect(self.operating_port_chosen)

@@ -72,6 +72,7 @@ class QSerialPortWorker(QObject):
     def isOpen(self):
         return self.serialPort.isOpen()
 
+
 class SerialThread(QThread):
     openPort = pyqtSignal(str)
     writeData = pyqtSignal(bytes)
@@ -92,20 +93,8 @@ class SerialThread(QThread):
     def is_port_open(self):
         return self.worker.isOpen()
 
-    def stop(self): #завершение потока в случае отключения ардуино
+    def stop(self):  #завершение потока в случае отключения ардуино
         self.quit()
         self.wait()
 
 
-class TenzoReader(QThread):
-    dataReceived = pyqtSignal(object)
-    def __init__(self, serial:SerialThread):
-        super().__init__()
-        self.serial = serial
-    def run(self):
-        while self.serial.worker.serialPort.canReadLine():
-            line = self.serial.worker.serialPort.readLine().decode('utf-8').strip()
-            self.dataReceived.emit(line)
-    def stop(self): #завершение потока в случае отключения ардуино
-        self.quit()
-        self.wait()

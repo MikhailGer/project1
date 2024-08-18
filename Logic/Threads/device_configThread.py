@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QThread, pyqtSignal
-from Managers.device_configManager import Device_Configuration_Manager
+from Logic.Managers.device_configManager import Device_Configuration_Manager
 
 
 class DeviceConfigThread(QThread):

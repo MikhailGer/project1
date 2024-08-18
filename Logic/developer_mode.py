@@ -1,27 +1,27 @@
-from Threads.SerialConnection import TenzoReader
+import time
 
 from config import Default_Device_Configuration
 
 from PyQt5.QtCore import QStringListModel
 
-from SettingGUI.ControlPanelWindow import App
-from ArduinoCommands import ArduinoCommands
-
+from Logic.ArduinoCommands import ArduinoCommands
 
 class DevMode:
-    def __init__(self, main_window: App):
+    def __init__(self, main_window):
         self.send_command = ArduinoCommands(main_window)
         self.main_window = main_window
-        self.main_window.pushButton_base_motor.connect(self.move_base)
-        self.main_window.pushButton_stand_motor.connect(self.move_head)
+        self.main_window.pushButton_base_motor.clicked.connect(self.move_base)
+        self.main_window.pushButton_stand_motor.clicked.connect(self.move_head)
 
         self.model = QStringListModel()
         self.model.setStringList([])
         self.main_window.listView_tenzo.setModel(self.model)
 
-        self.tenzo_reader_thread = TenzoReader(self.main_window.serial)
-        self.tenzo_reader_thread.dataReceived.connect(self.handle_data)
+        self.serial = self.main_window.serial.dataReceived.connect(self.handle_data)
         self.data_list = []
+
+        self.main_window.pushButton_base_motor.clicked.connect(self.move_base)
+        self.main_window.pushButton_stand_motor.clicked.connect(self.move_head)
 
         self.base_motor_steps = 0
         self.base_motor_speed = 0
@@ -35,13 +35,17 @@ class DevMode:
         
     def start_mode(self):
         self.send_command.tenzo_on()
+        time.sleep(0.05)
         self.send_command.set_tenzo_updaterate(Default_Device_Configuration.tenzo_update_rate_default)
+        time.sleep(0.05)
         self.send_command.steppers_on()
+        time.sleep(0.05)
 
     def handle_data(self, data):
+        line = data.data().decode("utf-8")
         if len(self.data_list) >= 100:
             self.data_list.pop(0)
-        self.data_list.append(data)
+        self.data_list.append(line)
         self.model.setStringList(self.data_list)
 
     def move_base(self):
@@ -86,15 +90,34 @@ class DevMode:
             self.main_window.pushButton_stand_motor.disconnect(self.move_head)
         except Exception:
             pass
-        self.send_command.tenzo_off()
-        self.send_command.steppers_off()
-        self.send_command.return_head()
-        self.send_command.return_base()
 
+        self.send_command.tenzo_off()
+        time.sleep(0.05)
+        self.send_command.steppers_off()
+        time.sleep(0.05)
+        self.send_command.return_head()
+        time.sleep(0.05)
+        self.send_command.return_base()
+        time.sleep(0.05)
         self.model.setStringList([])
         self.data_list.clear()
 
-        self.tenzo_reader_thread.stop()
+        self.serial = self.main_window.serial.dataReceived.connect(self.handle_data)
+
+        self.main_window.lineEdit_base_motor_steps.clear()
+        self.main_window.lineEdit_base_motor_speed.clear()
+        self.main_window.lineEdit_base_acceleration.clear()
+        self.main_window.lineEdit_base_MaxSpeed.clear()
+
+        self.main_window.lineEdit_stand_motor_steps.clear()
+        self.main_window.lineEdit_stand_motor_speed.clear()
+        self.main_window.lineEdit_head_acceleration.clear()
+        self.main_window.lineEdit_head_MaxSpeed.clear()
+
+        self.model.setStringList([])
+
+        self.main_window.pushButton_base_motor.clicked.disconnect(self.move_base)
+        self.main_window.pushButton_stand_motor.clicked.disconnect(self.move_head)
 
     def is_float(self, string):
         try:

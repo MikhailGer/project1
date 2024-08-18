@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QThread, pyqtSignal
-from Managers.disc_scanManager import DiscScanManager
+from Logic.Managers.bladeManager import BladeManager
 
 
 class DiscScanThread(QThread):
@@ -7,7 +7,7 @@ class DiscScanThread(QThread):
 
     def __init__(self, method_name, *args, **kwargs):
         super().__init__()
-        self.bd_manager = DiscScanManager()
+        self.bd_manager = BladeManager()
         self.method_name = method_name
         self.args = args
         self.kwargs = kwargs
@@ -28,20 +28,12 @@ class DiscScanThread(QThread):
         finally:
             self.bd_manager.close()
 
-    def addScan(self, disc_id, is_training=bool):
-        return self.bd_manager.addScan(disc_id, is_training)
+    def addBlade(self, disc_scan_id, num, scan, prediction):
+        return self.bd_manager.addBlade(disc_scan_id, num, scan, prediction)
 
-    def getCurrentScanID(self):
-        return self.bd_manager.getCurrentScanID()
+    def getBladeList(self, disc_scan_id):
+        return self.bd_manager.getBladeList(disc_scan_id)
 
-    def NotCurrentYet(self, disc_scan_id):
-        return self.bd_manager.NotCurrentYet()
+    def getBlade(self, blade_id):
+        return self.bd_manager.getBlade(blade_id)
 
-    def getScanIDList(self, disc_id):
-        return  self.bd_manager.getScanIDList(disc_id)
-
-    def deleteScan(self, disc_id):
-        return self.bd_manager.deleteScan(disc_id)
-
-    def deleteCurrentScan(self):
-        return self.bd_manager.deleteCurrentScan()

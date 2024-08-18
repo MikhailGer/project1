@@ -1,4 +1,4 @@
-from Managers.DataBaseManager import DBManager
+from Logic.Managers.DataBaseManager import DBManager
 
 
 class DiscScanManager:

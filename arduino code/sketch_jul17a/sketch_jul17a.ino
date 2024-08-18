@@ -1,16 +1,17 @@
 //протокол для свзи с комьютером(key(число), data1, data2,...,dataN):
 //keys:
-//0 - выключить вывод тензодатчика в serial
-//1 - включить вывод тензодатчика в serial
-//2 - задать новую частоту обновления тензодатчика в serial\
-//3 - тарирование тензодатчика
-//4 - мотор базы (скорость, макс. скорость, ускорение, количество шагов)
-//5 - мотор давящей головки (скорость, макс. скорость ,ускорение, количество шагов)
-//6 - надавить(макс. скорость базы ,ускорение базы, скорость возврата, ускорение возврата, требуемое давление)
-//7 - включить двигатели(должно выполнятся перед 4,5,6)
-//8 - выключить двигатели
-//9 - вернуть головку стартовое положение
-//10 - задать рабочее положение головки(нужно выяснить количество шагов до рабочего положение)
+//1 - выключить вывод тензодатчика в serial
+//2 - включить вывод тензодатчика в serial
+//3 - задать новую частоту обновления тензодатчика в serial\
+//4 - тарирование тензодатчика
+//5 - мотор базы (скорость, макс. скорость, ускорение, количество шагов)
+//6 - мотор давящей головки (скорость, макс. скорость ,ускорение, количество шагов)
+//7 - надавить(макс. скорость базы ,ускорение базы, скорость возврата, ускорение возврата, требуемое давление)
+//8 - включить двигатели(должно выполнятся перед 5,6,7)
+//9 - выключить двигатели
+//10 - вернуть головку стартовое положение
+//11 - задать рабочее положение головки(нужно выяснить количество шагов до рабочего положение)
+//12 - вернуть базу 
 #include <HX711_ADC.h>
 #include <GyverStepper.h>
 
@@ -47,7 +48,7 @@ int pressure = 0;
 bool presure_flag = false;
 
 int32_t head_init_pos = stepper_head.getCurrent();
-
+int32_t base_init_pos = stepper_head.getCurrent();
 
 void setup() {
 
@@ -131,9 +132,9 @@ void loop() {
       int amount = Serial.readBytesUntil(';', str, 99);
       str[amount] = '\0';
 
-      if (Serial.available() > 0){
-        Serial.read(); // для того чтобы прочитать ";" если отправить ; в конец строчки
-        }
+//      while (Serial.available() != 0){
+//        Serial.read(); // для того чтобы прочитать ";" если отправить ; в конец строчки
+//        }
       
 //      Serial.println(str); //для отладки парсинга
     
@@ -154,31 +155,32 @@ void loop() {
         }
 //      for (int i = 0; i < count; i++) Serial.println(data[i]); //для отладки парсинга
       prevAm = 0; 
+      Serial.println(key_elem);
+
       
       switch(key_elem){
-        case 0:
-              Serial.println("case 0");
-              Serial.println(key_elem);
+        case 1:
               Serial.println("Tenzo not in serial");
               TenzoFlag = false;
               break;
            
-        case 1:
+        case 2:
             Serial.println("Tenzo in serial");
             TenzoFlag = true;
             break;
             
-       case 2:
+       case 3:
             TenzoUpdateRate = data[0];
             break;
 
-       case 3:
+       case 4:
             LoadCell.tareNoDelay();
             Serial.println("Tared");
             break;
         
                     
-        case 4: 
+        case 5: 
+          Serial.println("five");
           current_speed_base = data[0];
           max_speed_base = data[1];
           acceleration_base = data[2];
@@ -189,7 +191,7 @@ void loop() {
           stepper_base.setTarget(base_steps, RELATIVE);
           
           break;
-        case 5: 
+        case 6: 
           current_speed_head = data[0];
           max_speed_head = data[1];
           acceleration_head = data[2];
@@ -200,8 +202,8 @@ void loop() {
           stepper_head.setTarget(head_steps, RELATIVE);
           
           break;
-        case 6: 
-         //4 - надавить(макс. скорость базы ,ускорение базы, скорость возврата, ускорение возврата, требуемое давление)
+        case 7: 
+         //7 - надавить(макс. скорость базы ,ускорение базы, скорость возврата, ускорение возврата, требуемое давление)
           if (!presure_flag){
             stepper_base.brake();      // перестраховка что база остановится перед движением.
             max_speed_base = data[0];
@@ -220,32 +222,40 @@ void loop() {
           break;
        
         
-        case 7: 
+        case 8: 
           stepper_base.enable(); //при включенном питании двигатели неподвижны
           stepper_head.enable();
           break;
 
-       case 8:
+       case 9:
           stepper_base.disable(); //при выключенном питании двигатели подвижны
           stepper_head.disable();
           break;
 
-       case 9: //вернуть голову в изначальное положение
+       case 10: //вернуть голову в изначальное положение
          stepper_head.setMaxSpeed(1500);     
          stepper_head.setAcceleration(1500);
          stepper_head.setTarget(head_init_pos);
          presure_flag = false;//в любом случае процесс давления прекращается    
          break;
 
-       case 10:
+       case 11:
           head_working_pos = static_cast<long>(data[0]);
           stepper_head.setMaxSpeed(1500);     
           stepper_head.setAcceleration(1500);
           stepper_head.setTarget(head_working_pos, ABSOLUTE);
-          break;       
-  }
+          break; 
 
-  
+       case 15:
+
+          stepper_base.setMaxSpeed(1500);
+          stepper_base.setAcceleration(500);
+          stepper_base.setTarget(base_init_pos, ABSOLUTE);
+          
+  }
+      
+
+}
       unsigned long currentMillis = millis();
       if (currentMillis - lastUpdateTime >= TenzoUpdateRate) {
         lastUpdateTime = currentMillis;
@@ -260,6 +270,7 @@ void loop() {
           }
         }
       }
+      
       if(presure_flag == true){
         static bool returning_to_start = false;
         
@@ -301,9 +312,10 @@ void loop() {
         
         
         }
-      
 
-}
+
+
+
   }
 }
 
