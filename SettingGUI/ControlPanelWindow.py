@@ -27,12 +27,11 @@ class App(QMainWindow, Ui_mainWindow):
         # далее создается отдельный поток для связи с ардуино
         self.serial = SerialThread()
         self.serial.start()
-        self.serial.dataReceived.connect(self.handleDataReceived)
+        # self.serial.dataReceived.connect(self.handleDataReceived)
 
         self.init_signals()
         self.init_ui()
         self.currentDisc = str
-
     def init_signals(self):
         self.signal = Signals()
         self.signal.custom_signal.connect(self.stackedWidget.setCurrentIndex)
@@ -240,8 +239,11 @@ class App(QMainWindow, Ui_mainWindow):
     def handle_handshake_receive(self, receive):
         response = receive.data().decode('utf-8')
         if "connected" in response:
-            self.serial.dataReceived.disconnect(self.handle_handshake_receive)
-            self.serial.dataReceived.connect(self.handleDataReceived)
+            try:
+                self.serial.dataReceived.disconnect(self.handle_handshake_receive)
+            except Exception:
+                pass
+            # self.serial.dataReceived.connect(self.handleDataReceived)
             print("Arduino ready to work")
             self.check_arduino = ArduinoChecker(self.comboBox_ports.currentText())
             self.check_arduino.device_disconnected_signal.connect(self.arduino_disconected)
@@ -250,8 +252,11 @@ class App(QMainWindow, Ui_mainWindow):
             self.check_arduino.start()
             self.start_window_mode()
         else:
-            self.serial.dataReceived.disconnect(self.handle_handshake_receive)
-            self.serial.dataReceived.connect(self.handleDataReceived)
+            try:
+                self.serial.dataReceived.disconnect(self.handle_handshake_receive)
+            except Exception:
+                pass
+            # self.serial.dataReceived.connect(self.handleDataReceived)
             print("Arduino isn't ready to work")
             self.serial.closePort.emit()
             self.comboBox_mods.setEnabled(False)
