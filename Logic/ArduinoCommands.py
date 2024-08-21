@@ -39,4 +39,4 @@ class ArduinoCommands:
         self.serial.writeData.emit(f"11,{str(steps)};".encode())
 
     def return_base(self):
-        self.serial.writeData.emit("15;".encode())
+        self.serial.writeData.emit("12;".encode())

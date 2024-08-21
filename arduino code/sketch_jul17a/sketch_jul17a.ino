@@ -246,7 +246,7 @@ void loop() {
           stepper_head.setTarget(head_working_pos, ABSOLUTE);
           break; 
 
-       case 15:
+       case 12:
 
           stepper_base.setMaxSpeed(1500);
           stepper_base.setAcceleration(500);
