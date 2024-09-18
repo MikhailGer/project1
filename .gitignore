@@ -3,3 +3,5 @@ gitignor/
 __pycache__/
 *.pyc
 *.pyo
+.env
+review

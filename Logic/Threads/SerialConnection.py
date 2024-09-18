@@ -1,9 +1,52 @@
 import time
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
+import threading
 
-from config import SerialBaudRate
+from config import DB_DATA
 
+class PortChecker(QThread):
+    port_list_signal = pyqtSignal(object)
+    finished = pyqtSignal()
+    def __init__(self):
+        super().__init__()
+        self.portlist = None
+        self.running = True
+        self.paused = False
+        self.condition = threading.Condition()
+
+    # def run(self):
+    #     self.running = True
+    #     while self.running:
+    #         ports = QSerialPortInfo().availablePorts()
+    #         self.portlist = [port.portName() for port in ports]
+    #         self.port_list_signal.emit(self.portlist)
+    #         time.sleep(1) #обновление портов раз в какое-то время
+
+    def run(self):
+        while self.running:
+            with self.condition:
+                if self.paused:
+                    self.condition.wait()  # Ожидание, пока поток не будет возобновлен
+
+            ports = QSerialPortInfo().availablePorts()
+            self.portlist = [port.portName() for port in ports]
+            self.port_list_signal.emit(self.portlist)
+            time.sleep(1)
+
+        self.finished.emit()
+    def pause(self):
+        with self.condition:
+            self.paused = True
+
+    def resume(self):
+        with self.condition:
+            self.paused = False
+            self.condition.notify()  # Пробуждение потока
+
+    def stop(self):
+        self.running = False
+        self.wait()
 
 class ArduinoChecker(QThread):
     device_disconnected_signal = pyqtSignal()
@@ -14,7 +57,7 @@ class ArduinoChecker(QThread):
         self.running = True
 
     def run(self):
-        # Хранение имени порта в начале # Укажите ваш порт
+        # Хранение имени порта в начале #Укажите ваш порт
 
         while self.running:
             available_ports = QSerialPortInfo.availablePorts()
@@ -41,7 +84,7 @@ class QSerialPortWorker(QObject):
     @pyqtSlot(str)
     def openPort(self, portName):
         self.serialPort.setPortName(portName)
-        self.serialPort.setBaudRate(SerialBaudRate)
+        self.serialPort.setBaudRate(int(DB_DATA.SerialBaudRate))
         if self.serialPort.open(QSerialPort.ReadWrite):
             print(f"Port {portName} opened successfully")
             self.serialPort.readyRead.connect(self.readData)

@@ -35,7 +35,7 @@ class DevMode:
         
     def start_mode(self):
         self.send_command.tenzo_on()
-        time.sleep(0.05)
+        time.sleep(0.05) #Перенести в команду
         self.send_command.set_tenzo_updaterate(Default_Device_Configuration.tenzo_update_rate_default)
         time.sleep(0.05)
         self.send_command.steppers_on()
@@ -92,17 +92,16 @@ class DevMode:
             pass
 
         self.send_command.tenzo_off()
-        time.sleep(0.05)
         self.send_command.steppers_off()
-        time.sleep(0.05)
         self.send_command.return_head()
-        time.sleep(0.05)
         self.send_command.return_base()
-        time.sleep(0.05)
         self.model.setStringList([])
         self.data_list.clear()
 
-        self.serial = self.main_window.serial.dataReceived.connect(self.handle_data)
+        try:
+            self.serial = self.main_window.serial.dataReceived.disconnect(self.handle_data)
+        except Exception:
+            pass
 
         self.main_window.lineEdit_base_motor_steps.clear()
         self.main_window.lineEdit_base_motor_speed.clear()

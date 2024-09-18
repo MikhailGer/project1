@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+#закомеченый combobox_port - раньше была возможность выбора порта, сейчас убрана
 # Form implementation generated from reading ui file 'sattings-app.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.10
@@ -9,7 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from resources import resources
+from SettingGUI.resources import resources
 
 
 class Ui_mainWindow(object):
@@ -61,9 +61,9 @@ class Ui_mainWindow(object):
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
         self.verticalLayout_2.addWidget(self.label)
-        self.comboBox_ports = QtWidgets.QComboBox(self.groupBox)
-        self.comboBox_ports.setObjectName("comboBox_ports")
-        self.verticalLayout_2.addWidget(self.comboBox_ports)
+        # self.comboBox_ports = QtWidgets.QComboBox(self.groupBox)
+        # self.comboBox_ports.setObjectName("comboBox_ports")
+        # self.verticalLayout_2.addWidget(self.comboBox_ports)
         self.verticalLayout_4.addLayout(self.verticalLayout_2)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_4.addItem(spacerItem)
@@ -436,23 +436,24 @@ class Ui_mainWindow(object):
         self.loop_stop.triggered['bool'].connect(self.loop_start.setDisabled) # type: ignore
         self.loop_start.toggled['bool'].connect(self.loop_start.setDisabled) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(mainWindow)
-        mainWindow.setTabOrder(self.comboBox_ports, self.comboBox_mods)
+        # mainWindow.setTabOrder(self.comboBox_ports, self.comboBox_mods)
+
 
     def retranslateUi(self, mainWindow):
         _translate = QtCore.QCoreApplication.translate
         mainWindow.setWindowTitle(_translate("mainWindow", "Панель управления установкой"))
-        self.label.setText(_translate("mainWindow", "Выбрать порт"))
+        # self.label.setText(_translate("mainWindow", "Выбрать порт"))
         self.label_2.setText(_translate("mainWindow", "Режим работы"))
         self.comboBox_mods.setItemText(1, _translate("mainWindow", "1.Полный диск"))
         self.comboBox_mods.setItemText(2, _translate("mainWindow", "2.Часть диска"))
         self.comboBox_mods.setItemText(3, _translate("mainWindow", "3.Обучение"))
         self.comboBox_mods.setItemText(4, _translate("mainWindow", "4.Отладка"))
-        self.label_0.setText(_translate("mainWindow", "Выберите порт и режим работы установки"))
+        self.label_0.setText(_translate("mainWindow", "Подключите устройство и выберите режим работы установки"))
         self.groupBox_1.setTitle(_translate("mainWindow", "Параметры режима"))
         self.label_3.setText(_translate("mainWindow", "Выбрать образец"))
         self.label_4.setText(_translate("mainWindow", "Отоброзить по:"))
-        self.comboBox_ID_name.setItemText(0, _translate("mainWindow", "ID"))
-        self.comboBox_ID_name.setItemText(1, _translate("mainWindow", "Name"))
+        self.comboBox_ID_name.setItemText(1, _translate("mainWindow", "ID"))
+        self.comboBox_ID_name.setItemText(0, _translate("mainWindow", "Name"))
         self.CreateDisc.setText(_translate("mainWindow", "Создать новый образец"))
         self.Results.setText(_translate("mainWindow", "Результаты образца"))
         self.DeleteDisc.setText(_translate("mainWindow", "Удалить выбранный образец"))

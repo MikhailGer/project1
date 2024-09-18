@@ -1,5 +1,5 @@
 import psycopg2
-from config import host, user, password, db_name
+from config import DB_DATA
 
 
 class DBManager:
@@ -11,10 +11,10 @@ class DBManager:
     def connect_to_DB(self):
         try:
             self.connection = psycopg2.connect(
-                host=host,
-                user=user,
-                password=password,
-                database=db_name,
+                host=DB_DATA.host,
+                user=DB_DATA.user,
+                password=DB_DATA.password,
+                database=DB_DATA.db_name,
             )
             self.cursor = self.connection.cursor()
 

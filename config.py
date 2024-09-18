@@ -1,15 +1,26 @@
+import os
 from dataclasses import dataclass
 from typing import Optional
+from dotenv import load_dotenv
 
-#база данных
-host = "127.0.0.1"
-user = "postgres"
-password = "87654321"
-db_name = "discs"
+load_dotenv()
 
+
+@dataclass
+class DB_Configuration:
+    host = os.getenv("DB_HOST", "")
+    user = os.getenv("DB_USER", "")
+    password = os.getenv("DB_PASS", "")
+    db_name = os.getenv("DB_NAME", "")
+    operating_port = os.getenv("OPPERATING_PORT", "")
+    SerialBaudRate = os.getenv("SERIAL_BAUDRATE", "")
 #serial port
-operating_port = "ttyUSB0"
-SerialBaudRate = 115200  #на ардуино в скетче 115200
+
+DB_DATA = DB_Configuration()
+
+# вынести в .env
+# operating_port = "ttyUSB0"
+# SerialBaudRate = 115200  #на ардуино в скетче 115200
 
 
 #параметры установки
